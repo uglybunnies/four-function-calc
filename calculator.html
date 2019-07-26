@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Calculator</title>
+  <style>
+    .calc {
+      background: #616166;
+      border-radius: .25em;
+      font-size: 1em;
+      max-width: 14em;
+      margin: 0 auto;
+      padding: 1em;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      grid-column-gap: 1em;
+      grid-row-gap: 1em;
+    }
+    .screen {
+      margin-bottom: 1em;
+      width: 100%;
+    }
+    .screen input {
+      box-sizing: border-box;
+      font-size: 1.25em;
+      text-align: right;
+      width: 100%;
+      padding: .25em;
+    }
+    .clearFunctions {
+      grid-template-areas: '. . cerror call';
+      grid-template-rows: auto;
+      margin-bottom: 1em;
+      text-align: right;
+    }
+    .clearFunctions button {
+      background-image: linear-gradient(to bottom, #44f, #33f);
+      color: #fff;
+    }
+    button {
+      border: 0;
+      border-radius: .125em;
+      font-size: 1.25em;
+    }
+    .number {
+      background-image: linear-gradient(to bottom, #aa6611, #994400);
+      color: #fff;
+    }
+    .function {
+      background-image: linear-gradient(to bottom, #ddd, #ccc);
+    }
+    .clearError {
+      grid-area: cerror;
+    }
+    .clearAll {
+      grid-area: call;
+    }
+  </style>
+</head>
+<body>
+  <div class="calc" id="calculator">
+    <div class="screen">
+      <input type="text" id="display" value="" placeholder="-">
+    </div>
+    <div class="clearFunctions grid">
+      <button class="clearError">CE</button>
+      <button class="clearAll">CA</button>
+    </div>
+    <div class="grid keysd">
+      <button class="number key9">9</button>
+      <button class="number key8">8</button>
+      <button class="number key">7</button>
+      <button class="function" data-operation="divide">&#247;</button>
+      <button class="number key6">6</button>
+      <button class="number key5">5</button>
+      <button class="number key4">4</button>
+      <button class="function" data-operation="multiply">x</button>
+      <button class="number key3">3</button>
+      <button class="number key2">2</button>
+      <button class="number key1">1</button>
+      <button class="function" data-operation="subtract">-</button>
+      <button class="number key0">0</button>
+      <button class="number decimal">.</button>
+      <button class="function" data-operation="add">+</button>
+      <button class="equal">=</button>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const self = calculator = {
+    calc: document.getElementById('calculator'),
+    screen: document.getElementById('display'),
+    value: null,
+    newValue: '',
+    activeFunction: null,
+    doExecute: false,
+    addListener: function() {
+      self.calc.addEventListener('click', function(e) {
+        let target = e.target;
+        if ((target.matches('.number') && !self.value) || (target.matches('.number') && self.doExecute)) {
+          self.updateDisplay(target.innerHTML);
+        }
+        else if (target.matches('.function') && !self.doExecute) {
+          self.value = parseFloat(self.screen.value);
+          self.activeFunction = target.dataset.operation;
+          self.doExecute = true;
+          self.newValue = '';
+        }
+        else if (target.matches('.function') || target.matches('.equal')) {
+          let newFunction = (target.matches('.function')) ? target.dataset.operation : null;
+          self.execute(self.activeFunction, newFunction);
+          self.activeFunction = (newFunction) ? newFunction : null;
+          self.doExecute = true;
+          self.newValue = '';
+        }
+        else if (target.matches('.clearError')) {
+          self.newValue = '';
+          self.screen.value = '';
+        }
+        else if (target.matches('.clearAll')) {
+          self.screen.value = '';
+          self.newValue = '';
+          self.value = null;
+          self.activeFunction = null;
+          self.doExecute = false;
+        }
+      });
+    },
+    updateDisplay: function(number) {
+      self.newValue += number;
+      self.screen.value = self.newValue;
+    },
+    divide: () => {
+      let dividend = self.value;
+      let divisor = parseFloat(self.screen.value);
+      if (divisor === 0) {
+        return NaN;
+      }
+      return dividend / divisor;
+    },
+    multiply: () => {
+      let multiplier = self.value;
+      let multiplicand = parseFloat(self.screen.value);
+      return multiplier * multiplicand;
+    },
+    subtract: () => {
+      let minuend = self.value;
+      let subtrahend = parseFloat(self.screen.value);
+      return minuend - subtrahend;
+    },
+    add: () => {
+      let addend1 = self.value;
+      let addend2 = parseFloat(self.screen.value);
+      return addend1 + addend2;
+    },
+    execute: (activeFn, newFn) => {
+      let newValue;
+      switch (activeFn) {
+        case 'add':
+          newValue = self.add();
+          break;
+        case 'subtract':
+          newValue = self.subtract();
+          break;
+        case 'multiply':
+          newValue = self.multiply();
+          break;
+        case 'divide': 
+          newValue = self.divide();
+          break;
+        default:
+          newValue = (self.value) ? self.value : parseFloat(self.screen.value);
+      }
+      self.screen.value = newValue;
+      self.value = (newValue) ? newValue : null;
+      self.activeFunction = newFn;
+      self.doExecute = false;
+    }
+  }
+  calculator.addListener(); 
+})();
+</script>
+</body>
+</html>
