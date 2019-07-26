@@ -65,7 +65,7 @@
 <body>
   <div class="calc" id="calculator">
     <div class="screen">
-      <input type="text" id="display" value="" placeholder="-">
+      <input type="text" id="display" value="0">
     </div>
     <div class="clearFunctions grid">
       <button class="clearError">CE</button>
@@ -94,96 +94,95 @@
 <script>
 (function(){
   const self = calculator = {
-    calc: document.getElementById('calculator'),
-    screen: document.getElementById('display'),
-    value: null,
-    newValue: '',
-    activeFunction: null,
-    doExecute: false,
-    addListener: function() {
-      self.calc.addEventListener('click', function(e) {
-        let target = e.target;
-        if ((target.matches('.number') && !self.value) || (target.matches('.number') && self.doExecute)) {
-          self.updateDisplay(target.innerHTML);
-        }
-        else if (target.matches('.function') && !self.doExecute) {
-          self.value = parseFloat(self.screen.value);
-          self.activeFunction = target.dataset.operation;
-          self.doExecute = true;
-          self.newValue = '';
-        }
-        else if (target.matches('.function') || target.matches('.equal')) {
-          let newFunction = (target.matches('.function')) ? target.dataset.operation : null;
-          self.execute(self.activeFunction, newFunction);
-          self.activeFunction = (newFunction) ? newFunction : null;
-          self.doExecute = true;
-          self.newValue = '';
-        }
-        else if (target.matches('.clearError')) {
-          self.newValue = '';
-          self.screen.value = '';
-        }
-        else if (target.matches('.clearAll')) {
-          self.screen.value = '';
-          self.newValue = '';
-          self.value = null;
-          self.activeFunction = null;
-          self.doExecute = false;
-        }
-      });
-    },
-    updateDisplay: function(number) {
-      self.newValue += number;
-      self.screen.value = self.newValue;
-    },
-    divide: () => {
-      let dividend = self.value;
-      let divisor = parseFloat(self.screen.value);
-      if (divisor === 0) {
-        return NaN;
+  calc: document.getElementById('calculator'),
+  screen: document.getElementById('display'),
+  value: 0,
+  newValue: '',
+  activeFunction: null,
+  doExecute: false,
+  addListener: function() {
+    self.calc.addEventListener('click', function(e) {
+      let target = e.target;
+      if ((target.matches('.number') && !self.value) || (target.matches('.number') && self.doExecute)) {
+        self.updateDisplay(target.innerHTML);
       }
-      return dividend / divisor;
-    },
-    multiply: () => {
-      let multiplier = self.value;
-      let multiplicand = parseFloat(self.screen.value);
-      return multiplier * multiplicand;
-    },
-    subtract: () => {
-      let minuend = self.value;
-      let subtrahend = parseFloat(self.screen.value);
-      return minuend - subtrahend;
-    },
-    add: () => {
-      let addend1 = self.value;
-      let addend2 = parseFloat(self.screen.value);
-      return addend1 + addend2;
-    },
-    execute: (activeFn, newFn) => {
-      let newValue;
-      switch (activeFn) {
-        case 'add':
-          newValue = self.add();
-          break;
-        case 'subtract':
-          newValue = self.subtract();
-          break;
-        case 'multiply':
-          newValue = self.multiply();
-          break;
-        case 'divide': 
-          newValue = self.divide();
-          break;
-        default:
-          newValue = (self.value) ? self.value : parseFloat(self.screen.value);
+      else if (target.matches('.function') && !self.doExecute) {
+        self.value = parseFloat(self.screen.value);
+        self.activeFunction = target.dataset.operation;
+        self.doExecute = true;
+        self.newValue = '';
       }
-      self.screen.value = newValue;
-      self.value = (newValue) ? newValue : null;
-      self.activeFunction = newFn;
-      self.doExecute = false;
+      else if (target.matches('.function') || target.matches('.equal')) {
+        let newFunction = (target.matches('.function')) ? target.dataset.operation : null;
+        self.execute(self.activeFunction, newFunction);
+        self.doExecute = true;
+        self.newValue = '';
+      }
+      else if (target.matches('.clearError')) {
+        self.newValue = '';
+        self.screen.value = '0';
+      }
+      else if (target.matches('.clearAll')) {
+        self.screen.value = '0';
+        self.newValue = '';
+        self.value = null;
+        self.activeFunction = null;
+        self.doExecute = false;
+      }
+    });
+  },
+  updateDisplay: function(number) {
+    self.newValue += number;
+    self.screen.value = self.newValue;
+  },
+  divide: () => {
+    let dividend = self.value;
+    let divisor = parseFloat(self.screen.value);
+    if (divisor === 0) {
+      return NaN;
     }
+    return dividend / divisor;
+  },
+  multiply: () => {
+    let multiplier = self.value;
+    let multiplicand = parseFloat(self.screen.value);
+    return multiplier * multiplicand;
+  },
+  subtract: () => {
+    let minuend = self.value;
+    let subtrahend = parseFloat(self.screen.value);
+    return minuend - subtrahend;
+  },
+  add: () => {
+    let addend1 = self.value;
+    let addend2 = parseFloat(self.screen.value);
+    return addend1 + addend2;
+  },
+  execute: (activeFn, newFn) => {
+    let newValue;
+    switch (activeFn) {
+      case 'add':
+        newValue = self.add();
+        break;
+      case 'subtract':
+        newValue = self.subtract();
+        break;
+      case 'multiply':
+        newValue = self.multiply();
+        break;
+      case 'divide': 
+        newValue = self.divide();
+        break;
+      default:
+        newValue = (self.value) ? self.value : parseFloat(self.screen.value);
+    }
+    self.screen.value = newValue;
+    self.value = (newValue) ? newValue : null;
+    self.activeFunction = newFn;
+    self.doExecute = false;
   }
-  calculator.addListener(); 
+}
+calculator.addListener();
 })();
 </script>
 </body>
